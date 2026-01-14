@@ -1,0 +1,15 @@
+SET(SOURCES screens/ui_ScreenMain.c
+    screens/ui_ScreenSettings.c
+    screens/ui_ScreenKeyboard.c
+    ui.c
+    components/ui_comp_hook.c
+    ui_helpers.c
+    ui_events.cpp
+    images/ui_img_pingpuppysmall_png.c
+    images/ui_img_wifi1_png.c
+    images/ui_img_wifi2_png.c
+    images/ui_img_wifi3_png.c
+    images/ui_img_wifi4_png.c
+    images/ui_img_wifi5_png.c)
+
+add_library(ui ${SOURCES})
