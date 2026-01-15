@@ -38,3 +38,7 @@ def hideKeyboard(event_struct):
 def setTextFromSave(event_struct):
     return
 
+
+def doCancel(event_struct):
+    return
+

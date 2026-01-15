@@ -16,6 +16,9 @@ extern char *timeZone;
 extern bool validTime;
 extern bool isScanning;
 extern int failureMode;
+extern int pingMinutes;
+extern int consecErrorReboot;
+extern void loadSettings();
 
 void setRelay(lv_event_t *e)
 {
@@ -72,7 +75,6 @@ static void mbox_event_cb(lv_event_t *e)
 {
 	lv_msgbox_close(mbox1);
 	isScanning = false;
-
 }
 
 void doTestConnection(lv_event_t *e)
@@ -129,8 +131,6 @@ void doWifiScan(lv_event_t *e)
 	lv_msgbox_close(mbox1);
 	isScanning = false;
 }
-
-
 
 void testHost(String host)
 {
@@ -189,6 +189,18 @@ void savePreferences(lv_event_t *e)
 	lv_dropdown_get_selected_str(ui_DropdownTimezone, tchr, 50);
 	strcpy(timeZone, tchr);
 	preferences.putString("timezone", timeZone);
+	preferences.putInt("pingMinutes", pingMinutes);
+	preferences.putInt("rebootCount", consecErrorReboot);
+	lv_dropdown_get_selected_str(ui_DropdownPing, tchr, 50);
+	pingMinutes = atoi(tchr);
+	preferences.putInt("pingMinutes", pingMinutes);
+	lv_dropdown_get_selected_str(ui_DropdownReboot, tchr, 50);
+	consecErrorReboot = atoi(tchr);
+	preferences.putInt("rebootCount", consecErrorReboot);
 	validTime = false;
 	failureMode = 0;
+}
+void doCancel(lv_event_t *e)
+{
+	loadSettings();
 }

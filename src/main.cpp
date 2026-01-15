@@ -44,7 +44,12 @@ bool doSetRelay = false;
 int relayIdx = 0;
 bool relayState = false;
 bool timerCalled = false;
-unsigned long check_time = 0;
+int pingMinutes = 0;
+int consecErrorReboot = 0;
+int failureMode = 0;
+int lastMinute = -1;
+int wifiConnectHoldoff = 0;
+int resetCtr = 0;
 
 int pingCtr = 0;
 int pingFailCtr = 0;
@@ -266,6 +271,14 @@ void loadSettings()
 
   strcpy(timeZone, preferences.getString("timezone").c_str());
   lv_dropdown_set_selected(ui_DropdownTimezone, lv_dropdown_get_option_index(ui_DropdownTimezone, timeZone));
+
+  validTime = false;
+  failureMode = 0;
+  pingMinutes = preferences.getInt("pingMinutes", 0);
+  lv_dropdown_set_selected(ui_DropdownPing, lv_dropdown_get_option_index(ui_DropdownPing, String(pingMinutes).c_str()));
+  consecErrorReboot = preferences.getInt("rebootCount", 0);
+  lv_dropdown_set_selected(ui_DropdownReboot, lv_dropdown_get_option_index(ui_DropdownReboot, String(consecErrorReboot).c_str()));
+
 }
 
 void setup()
@@ -319,10 +332,6 @@ bool doPing(String host)
 int lstWifiStatus = -1;
 int lstWifiStrength = 0;
 
-int failureMode = 0;
-int lastMinute = -1;
-int wifiConnectHoldoff = 0;
-int resetCtr = 0;
 void loop()
 {
 
@@ -387,7 +396,7 @@ void loop()
         {
 
           lastMinute = minute;
-          if (minute % 2 == 0 || failureMode > 2)
+          if (minute % pingMinutes == 0 || failureMode > 2)
           { // every 2 minutes or in failure mode
             String host1 = lv_textarea_get_text(ui_TextAreaHost1);
             String host2 = lv_textarea_get_text(ui_TextAreaHost2);
@@ -463,7 +472,7 @@ void loop()
       }
       String timeStr = current_date + " " + format_time(hour) + ":" + format_time(minute) + ":" + format_time(second);
       lv_label_set_text(ui_LabelTOD, timeStr.c_str());
-      if(pingFailCtr>=10)
+      if(pingFailCtr>=consecErrorReboot && consecErrorReboot>0)
       {
         pingFailCtr=0;
         resetCtr = 20;
